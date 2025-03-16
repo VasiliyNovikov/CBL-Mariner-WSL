@@ -26,7 +26,7 @@ docker start $containerName
 # Install missing packages
 docker exec -it $containerName tdnf update -y
 docker exec -it $containerName tdnf upgrade -y
-docker exec -it $containerName tdnf install -y util-linux tzdata sudo lsb-release jq nano iputils iproute net-tools bind-utils procps-ng git
+docker exec -it $containerName tdnf install -y util-linux tzdata sudo lsb-release jq nano iputils iproute net-tools bind-utils procps-ng gawk git
 
 # Export Container Filesystem
 docker stop $containerName
