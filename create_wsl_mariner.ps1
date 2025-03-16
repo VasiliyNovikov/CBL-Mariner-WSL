@@ -16,28 +16,26 @@ if (Test-Path $wslDistroPath) {
     Remove-Item $wslDistroPath -Recurse -Force
 }
 
-# Step 1: Pull Docker Image
+# Pull Docker Image
 docker pull $dockerImage
 
-# Step 2: Create a Docker Container
+# Create a Docker Container
 docker create --name $containerName -t -i $dockerImage bash
-
-# Step 3: Install missing packages and configure container before exporting
 docker start $containerName
+
+# Install missing packages
 docker exec -it $containerName tdnf update -y
 docker exec -it $containerName tdnf upgrade -y
-docker exec -it $containerName tdnf install -y util-linux tzdata sudo lsb-release gnupg jq nano iputils iproute net-tools bind-utils procps-ng git
-docker exec -it $containerName bash -c "mkdir -p /mnt/{c,d,e,f,m}"
-docker exec -it $containerName bash -c "echo -e '[interop]\nappendWindowsPath = false\n[automount]\nroot = /mnt\noptions = metadata' > /etc/wsl.conf"
-docker stop $containerName
+docker exec -it $containerName tdnf install -y util-linux tzdata sudo lsb-release jq nano iputils iproute net-tools bind-utils procps-ng git
 
-# Step 4: Export Container Filesystem
+# Export Container Filesystem
+docker stop $containerName
 docker export --output=$exportedTar $containerName
 
-# Step 5: Prepare WSL Directory
+# Prepare WSL Directory
 New-Item -Path $wslDistroPath -ItemType Directory -Force
 
-# Step 6: Import Filesystem to WSL
+# Import Filesystem to WSL
 wsl --import $wslDistroName $wslDistroPath $exportedTar
 
 # Cleanup
